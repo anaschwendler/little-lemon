@@ -6,12 +6,14 @@ from django.core.paginator import Paginator, EmptyPage
 
 from rest_framework.renderers import StaticHTMLRenderer
 from rest_framework.response import Response
-from rest_framework.decorators import api_view, renderer_classes, permission_classes
+from rest_framework.decorators import api_view, renderer_classes, permission_classes, throttle_classes
 from rest_framework.permissions import IsAuthenticated
+from rest_framework.throttling import AnonRateThrottle, UserRateThrottle
 
 
 # Create your views here.
 class MenuItemsView(generics.ListCreateAPIView):
+    throttle_classes = [AnonRateThrottle]
     serializer_class = MenuItemSerializer
     
     def get_queryset(self):
@@ -69,3 +71,14 @@ def manager_view(request):
         return Response({'message':'Only manager should see it'})
     else:
         return Response({'message':'You are not authorized'})
+    
+@api_view()
+@throttle_classes([AnonRateThrottle])
+def throttle_check(request):
+    return Response({'message':'successful'})
+    
+@api_view()
+@permission_classes([IsAuthenticated])
+@throttle_classes([UserRateThrottle])
+def throttle_check_auth(request):
+    return Response({'message':'successful, only for auth users'})

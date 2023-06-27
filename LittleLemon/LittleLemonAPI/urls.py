@@ -9,6 +9,8 @@ urlpatterns = [
     path("menu-items/<int:pk>", views.SingleMenuItemView.as_view()),
     path("categories/<int:pk>", views.SingleMenuItemView.as_view(), name="categories"),
     path("secret", views.secret),
-    path("manager_view", views.manager_view),
+    path("manager-view", views.manager_view),
+    path("throttle-check", views.throttle_check),
+    path("throttle-check-auth", views.throttle_check_auth),
     path("api-token-auth", obtain_auth_token),
 ]
