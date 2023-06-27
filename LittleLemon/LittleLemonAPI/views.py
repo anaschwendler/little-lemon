@@ -2,11 +2,13 @@ from rest_framework import generics
 from .models import MenuItem, Category
 from .serializers import MenuItemSerializer, CategorySerializer
 from django.shortcuts import get_object_or_404
+from django.core.paginator import Paginator, EmptyPage
 
 from rest_framework.renderers import StaticHTMLRenderer
 from rest_framework.response import Response
-from rest_framework.decorators import api_view, renderer_classes
-from django.core.paginator import Paginator, EmptyPage
+from rest_framework.decorators import api_view, renderer_classes, permission_classes
+from rest_framework.permissions import IsAuthenticated
+
 
 # Create your views here.
 class MenuItemsView(generics.ListCreateAPIView):
@@ -54,3 +56,16 @@ class SingleCategoryView(generics.RetrieveUpdateAPIView, generics.DestroyAPIView
 def welcome(request):
     data = '<html><body><h1>Welcome To Little Lemon API Project</h1></body></html>'
     return Response(data)
+
+@api_view()
+@permission_classes([IsAuthenticated])
+def secret(request):
+    return Response({'message':'Some secret message'})
+
+@api_view()
+@permission_classes([IsAuthenticated])
+def manager_view(request):
+    if request.user.groups.filter(name='Manager').exists():
+        return Response({'message':'Only manager should see it'})
+    else:
+        return Response({'message':'You are not authorized'})
